@@ -6,6 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-    
+    <script>
+        let sse = new EventSource('http://localhost:8080/stream');
+        sse.onmessage = console.log;
+    </script>
 </body>
 </html>

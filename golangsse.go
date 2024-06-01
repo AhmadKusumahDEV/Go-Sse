@@ -26,7 +26,6 @@ func sseStream() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// call prepareHeaderForSSE for start endpoint as SSE server
 		prepareHeaderForSSE(w)
-
 		// initialize messageChan
 		messageChan = make(chan string)
 
@@ -34,6 +33,7 @@ func sseStream() http.HandlerFunc {
 		// closing messageChan channel and
 		// set it to nil
 		defer func() {
+			fmt.Println("bye")
 			close(messageChan)
 			messageChan = nil
 		}()
@@ -52,7 +52,6 @@ func sseStream() http.HandlerFunc {
 		}
 	}
 }
-
 
 // sendMessage used to write data into messageChan and flushed to client through sseStream
 func sseMessage(message string) http.HandlerFunc {
