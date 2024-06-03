@@ -27,13 +27,14 @@ func sseStream() http.HandlerFunc {
 		// call prepareHeaderForSSE for start endpoint as SSE server
 		prepareHeaderForSSE(w)
 		// initialize messageChan
+		fmt.Println("hei")
 		messageChan = make(chan string)
 
 		// calling anonymous function that
 		// closing messageChan channel and
 		// set it to nil
 		defer func() {
-			fmt.Println("bye")
+			fmt.Println("done")
 			close(messageChan)
 			messageChan = nil
 		}()
@@ -43,11 +44,13 @@ func sseStream() http.HandlerFunc {
 		// client until closed
 		flusher, _ := w.(http.Flusher)
 		for {
-			write, err := writeData(w)
-			if err != nil {
-				log.Println(err)
-			}
-			log.Println(write)
+			// _, err := writeData(w)
+			// if err != nil {
+			// 	log.Println(err)
+			// }
+			<-messageChan
+			// log.Println(write)
+			fmt.Println("flushed")
 			flusher.Flush()
 		}
 	}
@@ -58,6 +61,8 @@ func sseMessage(message string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if messageChan != nil {
 			messageChan <- message
+		} else {
+			fmt.Println("kosong anjg")
 		}
 	}
 }
