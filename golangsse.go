@@ -44,11 +44,11 @@ func sseStream() http.HandlerFunc {
 		// client until closed
 		flusher, _ := w.(http.Flusher)
 		for {
-			// _, err := writeData(w)
-			// if err != nil {
-			// 	log.Println(err)
-			// }
-			<-messageChan
+			_, err := writeData(w)
+			if err != nil {
+				log.Println(err)
+			}
+
 			// log.Println(write)
 			fmt.Println("flushed")
 			flusher.Flush()
