@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -66,6 +67,9 @@ func progressor(c *gin.Context) {
 		"completed":          false,
 	})
 
+	defer func() {
+		fmt.Println("done")
+	}()
 	// Flush the response to ensure the data is sent immediately
 	c.Writer.Flush()
 

@@ -33,11 +33,6 @@ func sseStream() http.HandlerFunc {
 		// calling anonymous function that
 		// closing messageChan channel and
 		// set it to nil
-		defer func() {
-			fmt.Println("done")
-			close(messageChan)
-			messageChan = nil
-		}()
 
 		// create http http.Flusher that allows
 		// http handler to flush buffered data to
