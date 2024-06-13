@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Display</title>
+</head>
+<body>
+    <h1>Headers from /resource</h1>
+    <ul id="headers-list">
+        <!-- Headers will be appended here -->
+    </ul>
+
+    <script>
+        // Function to fetch headers and append to the list
+        async function fetchHeaders() {
+            var gettag = localStorage.getItem('etag');
+            console.log(gettag);
+            try {
+                var headers = {
+                    'Content-Type': 'text/plain',
+                }
+                const response = await fetch('http://localhost:8080/caching', headers );
+                const headersList = document.getElementById('headers-list');
+                const etag = response.headers.get('ETag');
+                localStorage.setItem('etag', etag);
+                response.headers.forEach((value, key) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${key}: ${value}`;
+                    headersList.appendChild(li);
+                });
+                var data = localStorage.getItem('etag');
+                console.log(data);
+                // Log response for debugging
+                console.log(await response.json());
+
+            } catch (error) {
+                console.error('Error fetching headers:', error);
+            }
+        }
+
+        // Fetch headers on page load
+        window.onload = fetchHeaders;
+    </script>
+</body>
+</html>

@@ -11,8 +11,9 @@
 </body>
 
 <script>
-    const eventSource = new EventSource('http://localhost:8080/progress');
-
+    const eventSource = new EventSource('http://localhost:8080/events');
+   // const eventSource = new EventSource('http://localhost:8080/progress');
+    
 eventSource.addEventListener('progress', function (event) {
     const data = JSON.parse(event.data)
     console.log(event)

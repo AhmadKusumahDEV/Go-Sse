@@ -3,13 +3,28 @@ package main
 import (
 	"embed"
 	"fmt"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 )
 
 var f embed.FS
 
-var chane chan string
+var clients map[chan string]struct{}
+var lock sync.RWMutex
+
+func addCLient(clien chan string) {
+	lock.Lock()
+	defer lock.Unlock()
+	clients[clien] = struct{}{}
+}
+
+func removeClient(clien chan string) {
+	lock.Lock()
+	defer lock.Unlock()
+	delete(clients, clien)
+	close(clien)
+}
 
 func main() {
 	router := gin.Default()
@@ -35,27 +50,27 @@ func Sendevent(c *gin.Context) {
 	chane <- str
 }
 
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
-		c.Writer.Header().Set("Content-Type", "text/event-stream")
-		c.Writer.Header().Set("Cache-Control", "no-cache")
-		c.Writer.Header().Set("Connection", "keep-alive")
+// func CORSMiddleware() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+// 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+// 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+// 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+// 		c.Writer.Header().Set("Content-Type", "text/event-stream")
+// 		c.Writer.Header().Set("Cache-Control", "no-cache")
+// 		c.Writer.Header().Set("Connection", "keep-alive")
 
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-
-		c.Next()
-	}
-}
+// 		if c.Request.Method == "OPTIONS" {
+// 			c.AbortWithStatus(204)
+// 			return
+// 		}
+// 		c.Next()
+// 	}
+// }
 
 func progressor(c *gin.Context) {
-	chane = make(chan string)
+	chane := make(chan string)
+
 	noOfExecution := 10
 	progress := 0
 	progressPercentage := float64(progress) / float64(noOfExecution) * 100

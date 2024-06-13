@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+var count int = 0
+
 // Broker struct to manage connected clients
 type Broker struct {
 	clients map[chan string]struct{}
@@ -43,6 +45,9 @@ func (b *Broker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	count++
 
 	clientChan := make(chan string)
 	b.AddClient(clientChan)
@@ -78,12 +83,10 @@ func main() {
 
 	// Additional endpoint to send messages to clients
 	http.HandleFunc("/send", func(w http.ResponseWriter, r *http.Request) {
-		message := r.URL.Query().Get("message")
-		if message != "" {
-			broker.Broadcast(message)
-			w.Write([]byte("Message sent"))
-		} else {
-			http.Error(w, "Message is required", http.StatusBadRequest)
-		}
+		fmt.Println(count)
+		message := "alamak"
+		broker.Broadcast(message)
+		w.Write([]byte("Message sent"))
 	})
+	http.ListenAndServe("localhost:8080", nil)
 }
