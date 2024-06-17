@@ -7,7 +7,7 @@
 </head>
 <body>
     <script>
-        let sse = new EventSource('http://localhost:8080/stream');
+        let sse = new EventSource('http://localhost:8080/progress');
         sse.onmessage = console.log;
 
         window.addEventListener('beforeunload', function (event) {

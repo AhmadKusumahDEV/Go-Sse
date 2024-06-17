@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,19 +12,33 @@ type responseCahcing struct {
 	Dataaa any `json:"data"`
 }
 
-func CORSMiddleware() gin.HandlerFunc {
+// func CORSMiddleware() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+// 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+// 		// c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, ETag, X-Custom-Header-1, X-Custom-Header-2, X-Custom-Header-3")
+// 		// c.Writer.Header().Set("Access-Control-Expose-Headers", "ETag")
+
+// 		if c.Request.Method == "OPTIONS" {
+// 			c.AbortWithStatus(http.StatusNoContent)
+// 			return
+// 		}
+
+// 		c.Next()
+// 	}
+// }
+
+func etagMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		// c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, ETag, X-Custom-Header-1, X-Custom-Header-2, X-Custom-Header-3")
-		// c.Writer.Header().Set("Access-Control-Expose-Headers", "ETag")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
+		Res := c.Request.Header["Content-Type"]
+		fmt.Println(Res)
+		if len(Res) == 1 {
+			c.JSON(http.StatusOK, gin.H{"etag": Res})
+			c.Abort()
 			return
+		} else {
+			c.Next()
 		}
-
-		c.Next()
 	}
 }
 
@@ -31,7 +46,7 @@ func main() {
 	router := gin.Default()
 	router.Use(CORSMiddleware())
 
-	router.GET("/caching", caching)
+	router.GET("/caching", etagMiddleware(), caching)
 	router.GET("/resource", func(c *gin.Context) {
 		c.Header("X-Custom-Header-1", "Value1")
 		c.Header("X-Custom-Header-2", "Value2")
@@ -41,7 +56,7 @@ func main() {
 			"message": "Hello, World!",
 		})
 	})
-	router.Run(":8080")
+	router.Run(":8081")
 }
 
 var etag string = "some-unique-string"
