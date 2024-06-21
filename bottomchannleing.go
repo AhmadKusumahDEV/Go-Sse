@@ -22,6 +22,7 @@ func main() {
 	}()
 
 	for i := 0; i < 2; i++ {
+		fmt.Println("select")
 		select {
 		case value := <-ch1:
 			fmt.Println("Received from ch1:", value)
