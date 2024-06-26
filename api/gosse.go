@@ -46,47 +46,8 @@ func init() {
 			"enkripsi: get/post": "https://stockis.vercel.app/api/en",
 			"dekripsi: get/post": "https://stockis.vercel.app/api/des",
 		})
+		return
 	})
-
-	app.GET("/addclient", func(c *gin.Context) {
-		c.Header("Content-Type", "text/event-stream")
-		c.Header("Cache-Control", "no-cache")
-		c.Header("Connection", "keep-alive")
-
-		chane := make(chan string)
-		addCLient(chane)
-		defer removeClient(chane)
-		noOfExecution := 10
-		progress := 0
-		progressPercentage := float64(progress) / float64(noOfExecution) * 100
-
-		c.SSEvent("progress", map[string]interface{}{
-			"currentTask":        progress,
-			"progressPercentage": progressPercentage,
-			"noOftasks":          noOfExecution,
-			"completed":          false,
-		})
-		// Flush the response to ensure the data is sent immediately
-		c.Writer.Flush()
-
-		for {
-			select {
-			case message := <-chane:
-				c.SSEvent("progress", map[string]interface{}{
-					"currentTask":        progress,
-					"progressPercentage": progressPercentage,
-					"noOftasks":          noOfExecution,
-					"completed":          false,
-					"message":            message,
-				})
-				c.Writer.Flush()
-			case <-c.Request.Context().Done():
-				return
-			}
-		}
-	})
-
-	app.GET("/sendevent", Sendevent)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
