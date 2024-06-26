@@ -11,8 +11,8 @@
 </body>
 
 <script>
-    const eventSource = new EventSource('https://stockis.vercel.app/addclient');
-   // const eventSource = new EventSource('http://localhost:8080/progress');
+ //   const eventSource = new EventSource("https://go-sse.vercel.app/addclient");
+    const eventSource = new EventSource('http://localhost:8080/progress');
     
 eventSource.addEventListener('progress', function (event) {
     const data = JSON.parse(event.data)

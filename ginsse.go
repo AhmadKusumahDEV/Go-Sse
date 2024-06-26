@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"net/http"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -60,9 +61,6 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
-		c.Writer.Header().Set("Content-Type", "text/event-stream")
-		c.Writer.Header().Set("Cache-Control", "no-cache")
-		c.Writer.Header().Set("Connection", "keep-alive")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
@@ -73,8 +71,16 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 func progressor(c *gin.Context) {
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+
 	chane := make(chan string)
 	fmt.Println(len(clients))
+	flusher, ok := c.Writer.(http.Flusher)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Streaming unsupported!"})
+	}
 	addCLient(chane)
 	defer removeClient(chane)
 	fmt.Println(clients)
@@ -88,9 +94,8 @@ func progressor(c *gin.Context) {
 		"noOftasks":          noOfExecution,
 		"completed":          false,
 	})
+	flusher.Flush()
 	// Flush the response to ensure the data is sent immediately
-	c.Writer.Flush()
-
 	for {
 		select {
 		case message := <-chane:
@@ -101,7 +106,7 @@ func progressor(c *gin.Context) {
 				"completed":          false,
 				"message":            message,
 			})
-			c.Writer.Flush()
+			flusher.Flush()
 		case <-c.Request.Context().Done():
 			fmt.Println("done")
 			return

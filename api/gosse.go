@@ -49,6 +49,10 @@ func init() {
 		c.Header("Content-Type", "text/event-stream")
 		c.Header("Cache-Control", "no-cache")
 		c.Header("Connection", "keep-alive")
+		flusher, ok := c.Writer.(http.Flusher)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Streaming unsupported!"})
+		}
 
 		chane := make(chan string)
 		addCLient(chane)
@@ -64,7 +68,7 @@ func init() {
 			"completed":          false,
 		})
 		// Flush the response to ensure the data is sent immediately
-		c.Writer.Flush()
+		flusher.Flush()
 
 		for {
 			select {
@@ -76,7 +80,7 @@ func init() {
 					"completed":          false,
 					"message":            message,
 				})
-				c.Writer.Flush()
+				flusher.Flush()
 			case <-c.Request.Context().Done():
 				return
 			}
