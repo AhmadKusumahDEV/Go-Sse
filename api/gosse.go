@@ -41,8 +41,11 @@ func init() {
 	app = gin.New()
 	app.Use(cors.Default())
 
-	app.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "https://go-sse.vercel.app/addclient"})
+	app.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusAccepted, gin.H{
+			"enkripsi: get/post": "https://stockis.vercel.app/api/en",
+			"dekripsi: get/post": "https://stockis.vercel.app/api/des",
+		})
 	})
 
 	app.GET("/addclient", func(c *gin.Context) {
