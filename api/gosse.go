@@ -41,6 +41,10 @@ func init() {
 	app = gin.New()
 	app.Use(cors.Default())
 
+	app.GET("/", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "https://go-sse.vercel.app/addclient"})
+	})
+
 	app.GET("/addclient", func(c *gin.Context) {
 		c.Header("Content-Type", "text/event-stream")
 		c.Header("Cache-Control", "no-cache")
