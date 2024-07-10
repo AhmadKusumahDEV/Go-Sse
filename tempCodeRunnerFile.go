@@ -1,1 +1,2 @@
 
+	flusher.Flush()

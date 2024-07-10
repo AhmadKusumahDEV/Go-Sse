@@ -88,8 +88,10 @@ func progressor(c *gin.Context) {
 	progress := 0
 	progressPercentage := float64(progress) / float64(noOfExecution) * 100
 
+	var count int = 0
+
 	c.SSEvent("progress", map[string]interface{}{
-		"currentTask":        progress,
+		"currentTask":        "Task " + string(count),
 		"progressPercentage": progressPercentage,
 		"noOftasks":          noOfExecution,
 		"completed":          false,
@@ -99,8 +101,9 @@ func progressor(c *gin.Context) {
 	for {
 		select {
 		case message := <-chane:
+			count++
 			c.SSEvent("progress", map[string]interface{}{
-				"currentTask":        progress,
+				"currentTask":        count,
 				"progressPercentage": progressPercentage,
 				"noOftasks":          noOfExecution,
 				"completed":          false,

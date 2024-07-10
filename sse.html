@@ -8,15 +8,29 @@
 
 <body>
 
+    <div id="events"></div>
+
 </body>
 
 <script>
  //   const eventSource = new EventSource("https://go-sse.vercel.app/addclient");
     const eventSource = new EventSource('http://localhost:8080/progress');
     
+    function createEventElement(data) {
+        const eventDiv = document.createElement('div');
+        eventDiv.textContent = data.currentTask;
+        return eventDiv;
+    }
+
 eventSource.addEventListener('progress', function (event) {
     const data = JSON.parse(event.data)
-    console.log(event)
+
+    const event_data = createEventElement(data)
+
+    const getid = document.getElementById("events");
+    getid.appendChild(event_data);
+
+    console.log("on message : ",data)
 });
 
 

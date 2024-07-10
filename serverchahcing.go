@@ -7,6 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+"Selamat pagi/siang/sore,
+
+Perkenalkan, nama saya Jexsen Smith. Saat ini, saya terdaftar sebagai mahasiswa di Universitas Bina Sarana Informatika, jurusan Teknologi Informatika, dan saya berada di semester 6. Selama kuliah, saya sering membuat proyek kecil untuk mengasah konsep-konsep baru yang saya pelajari dari luar perkuliahan. Saya memiliki pemahaman yang baik tentang arsitektur mikroservices, penerapan API gateway, dan proses realtime melalui HTTP long polling dengan connection alive di header. Saya juga sedang mempersiapkan diri untuk menghadapi psikotes dalam waktu dekat."
+
 type responseCahcing struct {
 	Status int `json:"code"`
 	Dataaa any `json:"data"`
